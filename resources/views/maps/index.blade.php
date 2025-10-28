@@ -5,13 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peta Lokasi Interaktif</title>
-    
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
     <style>
         :root {
             --primary-color: #6a11cb;
@@ -35,14 +37,14 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-light);
             color: var(--text-dark);
-            overflow: hidden; /* Mencegah body scroll */
+            overflow: hidden;
         }
 
         .main-wrapper {
             display: flex;
             height: 100vh;
         }
-        
+
         /* === Sidebar (Daftar Lokasi) === */
         .sidebar {
             width: 420px;
@@ -53,7 +55,7 @@
             display: flex;
             flex-direction: column;
             transition: transform 0.3s ease;
-            z-index: 1001; /* Di atas peta */
+            z-index: 1001;
         }
 
         .sidebar-header {
@@ -74,21 +76,6 @@
             margin-top: 16px;
         }
 
-        #search-input {
-            width: 100%;
-            padding: 12px 16px 12px 40px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        #search-input:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
-        }
-        
         .search-wrapper svg {
             position: absolute;
             left: 12px;
@@ -99,10 +86,26 @@
             color: var(--text-light);
         }
 
+        #search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: var(--white);
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+        }
+
         .filter-section {
             padding: 16px 24px;
         }
-        
+
         .filter-buttons {
             display: flex;
             gap: 8px;
@@ -122,23 +125,23 @@
         }
 
         .filter-btn:hover {
-             background-color: var(--bg-light);
-             border-color: var(--secondary-color);
-             color: var(--secondary-color);
+            background-color: var(--bg-light);
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
         }
-        
+
         .filter-btn.active {
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             color: var(--white);
             border-color: transparent;
         }
-        
+
         .locations-list {
             flex-grow: 1;
             overflow-y: auto;
             padding: 0 24px 24px 24px;
         }
-        
+
         .list-header {
             display: flex;
             justify-content: space-between;
@@ -203,20 +206,20 @@
             align-items: center;
             gap: 6px;
         }
-        
+
         .location-description {
             color: #4a5568;
             font-size: 13px;
             line-height: 1.5;
         }
-        
+
         #no-results {
             text-align: center;
             color: #999;
             padding: 50px 20px;
-            display: none; /* Disembunyikan secara default */
+            display: none;
         }
-        
+
         /* === Area Peta === */
         .map-container {
             flex-grow: 1;
@@ -228,7 +231,7 @@
             width: 100%;
             z-index: 1;
         }
-        
+
         /* Style Popup Kustom */
         .leaflet-popup-content-wrapper {
             border-radius: 10px !important;
@@ -289,6 +292,7 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h1>🗺️ Peta Lokasi</h1>
+                <!-- Search Bar Ditambahkan Di Sini -->
                 <div class="search-wrapper">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -310,22 +314,22 @@
             </div>
 
             <div class="locations-list">
-                 <div class="list-header">
+                <div class="list-header">
                     <span>Hasil: <span id="location-count">{{ $locations->count() }}</span></span>
                 </div>
-                
+
                 @forelse($locations as $location)
-                <div class="location-card" 
+                <div class="location-card"
                      data-category="{{ $location->category }}"
-                     data-lat="{{ $location->latitude }}" 
+                     data-lat="{{ $location->latitude }}"
                      data-lng="{{ $location->longitude }}"
                      data-name="{{ strtolower($location->name) }}"
                      data-address="{{ strtolower($location->address) }}"
-                     data-description="{{ strtolower($location->description) }}">
-                    
+                     data-description="{{ strtolower($location->description ?? '') }}"> <!-- Menangani null description -->
+
                     @if($location->image)
-                    <img src="{{ Storage::url($location->image) }}" 
-                         alt="{{ $location->name }}" 
+                    <img src="{{ Storage::url($location->image) }}"
+                         alt="{{ $location->name }}"
                          class="location-image">
                     @endif
 
@@ -337,7 +341,7 @@
                         </svg>
                         {{ $location->address }}
                     </div>
-                    
+
                     @if($location->description)
                     <p class="location-description">{{ Str::limit($location->description, 80) }}</p>
                     @endif
@@ -359,24 +363,25 @@
         </main>
     </div>
 
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Data lokasi dari Laravel
             const locations = @json($locations);
 
-            // Inisialisasi peta (berpusat di Indonesia jika tidak ada lokasi, atau di lokasi pertama)
+            // Inisialisasi peta
             const initialView = locations.length > 0 ? [locations[0].latitude, locations[0].longitude] : [-6.5944, 106.7892];
             const map = L.map('map').setView(initialView, 13);
 
-            // Tambahkan tile layer (tampilan peta)
+            // Tambahkan tile layer (menggunakan Voyager dari CARTO)
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd',
                 maxZoom: 20
             }).addTo(map);
-            
+
             // Definisikan warna untuk setiap kategori
             const categoryColors = {
                 'Restoran': '#FF5733', 'Taman': '#28A745', 'Mall': '#FFC107',
@@ -385,16 +390,16 @@
 
             let markers = [];
 
-            // Fungsi untuk membuat ikon kustom yang menarik
+            // Fungsi untuk membuat ikon kustom
             function createIcon(category) {
                 const color = categoryColors[category] || '#6a11cb';
                 const html = `
                     <div style="
-                        background-color: ${color}; 
-                        width: 28px; height: 28px; 
-                        border-radius: 50% 50% 50% 0; 
+                        background-color: ${color};
+                        width: 28px; height: 28px;
+                        border-radius: 50% 50% 50% 0;
                         transform: rotate(-45deg);
-                        border: 3px solid white; 
+                        border: 3px solid white;
                         box-shadow: 0 2px 5px rgba(0,0,0,0.4);
                         display: flex; justify-content: center; align-items: center;
                     ">
@@ -415,7 +420,7 @@
             // Tambahkan markers ke peta
             locations.forEach(location => {
                 const icon = createIcon(location.category);
-                
+
                 let popupContent = '';
                 if (location.image) {
                     popupContent += `<img src="/storage/${location.image}" class="popup-image">`;
@@ -436,7 +441,7 @@
                 markers.push(marker);
             });
 
-            // === Bagian Fungsionalitas Inti (Filter dan Pencarian) ===
+            // === Fungsionalitas Filter dan Pencarian ===
 
             const filterButtons = document.querySelectorAll('.filter-btn');
             const locationCards = document.querySelectorAll('.location-card');
@@ -444,13 +449,11 @@
             const locationCountEl = document.getElementById('location-count');
             const noResultsEl = document.getElementById('no-results');
 
-            // Fungsi utama untuk menerapkan filter dan pencarian
             function applyFilters() {
                 const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
                 const searchTerm = searchInput.value.toLowerCase().trim();
                 let visibleCount = 0;
 
-                // 1. Filter kartu lokasi di sidebar
                 locationCards.forEach(card => {
                     const cardCategory = card.dataset.category;
                     const cardName = card.dataset.name;
@@ -459,7 +462,7 @@
 
                     const categoryMatch = activeCategory === 'all' || cardCategory === activeCategory;
                     const searchMatch = cardName.includes(searchTerm) || cardAddress.includes(searchTerm) || cardDescription.includes(searchTerm);
-                    
+
                     if (categoryMatch && searchMatch) {
                         card.classList.remove('hidden');
                         visibleCount++;
@@ -467,28 +470,26 @@
                         card.classList.add('hidden');
                     }
                 });
-                
-                // 2. Filter marker di peta
+
                 markers.forEach(marker => {
-                    map.removeLayer(marker); // Hapus semua dulu untuk efisiensi
+                    map.removeLayer(marker);
                     const markerCategory = marker.locationData.category;
                     const markerName = marker.locationData.name.toLowerCase();
                     const markerAddress = marker.locationData.address.toLowerCase();
-                    
+                    const markerDescription = (marker.locationData.description || '').toLowerCase(); // Handle null
+
                     const categoryMatch = activeCategory === 'all' || markerCategory === activeCategory;
-                    const searchMatch = markerName.includes(searchTerm) || markerAddress.includes(searchTerm);
+                    const searchMatch = markerName.includes(searchTerm) || markerAddress.includes(searchTerm) || markerDescription.includes(searchTerm);
 
                     if (categoryMatch && searchMatch) {
                         marker.addTo(map);
                     }
                 });
 
-                // 3. Update UI (jumlah & pesan)
                 locationCountEl.textContent = visibleCount;
                 noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
             }
-            
-            // Event listener untuk tombol filter kategori
+
             filterButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
                     filterButtons.forEach(b => b.classList.remove('active'));
@@ -497,28 +498,24 @@
                 });
             });
 
-            // Event listener untuk input pencarian
             searchInput.addEventListener('input', applyFilters);
 
-            // Event listener untuk klik kartu lokasi
             locationCards.forEach(card => {
                 card.addEventListener('click', function() {
                     const lat = parseFloat(this.dataset.lat);
                     const lng = parseFloat(this.dataset.lng);
-                    
+
                     map.flyTo([lat, lng], 16, {
                         animate: true,
                         duration: 1
                     });
-                    
-                    // Cari dan buka popup marker yang sesuai
+
                     const correspondingMarker = markers.find(marker => {
                         const markerLatLng = marker.getLatLng();
                         return markerLatLng.lat === lat && markerLatLng.lng === lng;
                     });
 
                     if (correspondingMarker) {
-                         // Tunggu sedikit agar animasi flyTo selesai
                         setTimeout(() => {
                             correspondingMarker.openPopup();
                         }, 800);
@@ -526,7 +523,7 @@
                 });
             });
 
-            // Panggil applyFilters() sekali di awal untuk menampilkan semua marker
+            // Tampilkan semua marker awalnya
             applyFilters();
         });
     </script>
