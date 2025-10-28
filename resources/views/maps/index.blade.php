@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Lokasi Interaktif</title>
+    <title>Peta Lokasi Interaktif Premium</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,10 +97,25 @@
         /* === Map Area === */
         .map-container { flex-grow: 1; position: relative; background: #eee; }
         #map { height: 100%; width: 100%; z-index: 1; }
-        .leaflet-top.leaflet-left { top: 78px; }
+        .leaflet-top.leaflet-left { top: 78px; } /* Pindah zoom control */
 
         /* === Mobile Responsive & Sidebar Toggle === */
-        #sidebar-toggle { display: none; position: absolute; top: 15px; left: 15px; z-index: 1003; width: 45px; height: 45px; background: var(--white); border: 1px solid var(--border-color); border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-md); justify-content: center; align-items: center; }
+        #sidebar-toggle {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 1003;
+            width: 45px;
+            height: 45px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            justify-content: center;
+            align-items: center;
+        }
         .map-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; }
 
         @media (max-width: 768px) {
@@ -111,9 +126,9 @@
         }
 
         /* === Custom Marker & Popup Style === */
-        @keyframes marker-pop { 0% { transform: scale(0.5) rotate(-45deg); opacity: 0; } 100% { transform: scale(1) rotate(-45deg); opacity: 1; } }
-        .custom-marker-pin { animation: marker-pop 0.3s ease-out forwards; }
-        .leaflet-popup-content-wrapper { border-radius: 10px !important; box-shadow: var(--shadow-md); min-width: 280px; /* Lebar popup diubah di sini */ }
+        @keyframes marker-pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .custom-marker-pin { animation: marker-pop 0.3s ease-out; }
+        .leaflet-popup-content-wrapper { border-radius: 10px !important; box-shadow: var(--shadow-md); }
         .leaflet-popup-content { margin: 15px !important; font-family: 'Plus Jakarta Sans', sans-serif; }
         .popup-image { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
         .popup-title { font-size: 16px; font-weight: 700; margin: 0 0 5px 0; }
@@ -124,9 +139,6 @@
         .locations-list::-webkit-scrollbar-track { background: transparent; }
         .locations-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; border: 2px solid var(--white); }
         .locations-list::-webkit-scrollbar-thumb:hover { background: #aaa; }
-
-        /* JIKA INGIN MENGHAPUS WATERMARK (TIDAK DISARANKAN) */
-        /* .leaflet-control-attribution { display: none !important; } */
     </style>
 </head>
 <body>
@@ -207,10 +219,9 @@
             const map = L.map('map', { zoomControl: false }).setView(initialView, 13);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            // GANTI TILE LAYER KE OPENSTREETMAP STANDAR (LEBIH DETAIL)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 19
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd', maxZoom: 20
             }).addTo(map);
             
             const categoryColors = {
@@ -220,31 +231,10 @@
 
             let markers = L.layerGroup().addTo(map);
 
-            // GANTI FUNGSI IKON KE MODEL PIN
             function createIcon(category) {
                 const color = categoryColors[category] || '#6a11cb';
-                const html = `
-                    <div style="
-                        background-color: ${color}; 
-                        width: 28px; height: 28px; 
-                        border-radius: 50% 50% 50% 0; 
-                        transform: rotate(-45deg);
-                        border: 3px solid white; 
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-                        display: flex; justify-content: center; align-items: center;
-                    ">
-                        <div style="
-                            width: 12px; height: 12px;
-                            background-color: white;
-                            border-radius: 50%;
-                        "></div>
-                    </div>`;
-                return L.divIcon({
-                    html: html,
-                    className: 'custom-marker-pin',
-                    iconSize: [30, 30],
-                    iconAnchor: [0, 15]
-                });
+                const html = `<div style="background-color:${color};width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 5px rgba(0,0,0,0.4);"></div>`;
+                return L.divIcon({ html: html, className: 'custom-marker-pin', iconSize: [26, 26], iconAnchor: [13, 13] });
             }
             
             function populateMarkers(filteredLocations) {
@@ -288,6 +278,7 @@
                     if (categoryMatch && searchMatch) {
                         card.classList.remove('hidden');
                         visibleCount++;
+                        // Cari data lokasi asli untuk dikirim ke peta
                         const originalLocation = locations.find(loc => loc.id == cardData.id);
                         if(originalLocation) filteredLocationsForMap.push(originalLocation);
                     } else {
@@ -298,7 +289,7 @@
                 populateMarkers(filteredLocationsForMap);
                 locationCountEl.textContent = visibleCount;
                 noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
-                setActiveCard(null);
+                setActiveCard(null); // Reset active card on filter
             }
 
             function setActiveCard(locationId) {
