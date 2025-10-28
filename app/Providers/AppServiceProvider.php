@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,14 +17,7 @@ class AppServiceProvider extends ServiceProvider
     {
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
-
-            // Set trusted proxies untuk Vercel (Laravel 12 / Symfony 7)
             Request::setTrustedProxies(['0.0.0.0/0'], 15);
-        }
-
-        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
-            $this->app['request']->server->set('HTTPS', 'on');
-            $_SERVER['HTTPS'] = 'on';
         }
     }
 }
