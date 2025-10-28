@@ -74,7 +74,7 @@
 
         .filter-section { padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
         .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .filter-btn { padding: 8px 16px; border: 1px solid var(--border-color); background: transparent; color: var(--text-light); border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.2s; text-transform: uppercase; }
+        .filter-btn { padding: 8px 16px; border: 1px solid var(--border-color); background: transparent; color: var(--text-light); border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; text-transform: uppercase; transition: all 0.2s; }
         .filter-btn:hover { border-color: var(--border-hover); color: var(--primary-color); box-shadow: var(--glow-shadow-sm); }
         .filter-btn.active { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: var(--bg-dark); border-color: transparent; font-weight: 700; box-shadow: 0 0 15px rgba(255, 0, 193, 0.4); }
 
@@ -98,10 +98,9 @@
         /* === Map Area === */
         .map-container { flex-grow: 1; position: relative; background: var(--bg-dark); }
         #map { height: 100%; width: 100%; z-index: 1; }
-        .leaflet-top.leaflet-right { top: 15px; right: 15px; }
+        .leaflet-top.leaflet-right { top: 15px; right: 15px; } /* Pindah zoom control */
         .leaflet-control-zoom-in, .leaflet-control-zoom-out { background-color: var(--bg-surface-solid) !important; border: 1px solid var(--border-color) !important; color: var(--primary-color) !important; border-radius: 4px !important; }
         .leaflet-control-zoom-in:hover, .leaflet-control-zoom-out:hover { background-color: var(--bg-dark) !important; }
-        .leaflet-control-attribution { background-color: rgba(10, 12, 26, 0.7) !important; padding: 2px 8px !important; color: var(--text-light) !important; }
 
         /* === Custom Marker & Popup Style === */
         @keyframes marker-pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -119,73 +118,43 @@
         .locations-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
         .locations-list::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
 
-        /* === PERBAIKAN MOBILE & SIDEBAR TOGGLE === */
-        #sidebar-toggle {
-            display: none; /* Hidden on desktop */
-            position: absolute;
-            top: 15px; left: 15px;
-            z-index: 1003;
-            width: 45px; height: 45px;
-            background: var(--bg-surface-solid);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
+        /* === Custom Cyberpunk Attribution Style === */
+        .leaflet-control-attribution a,
+        .leaflet-control-attribution .cyber-text {
+            font-family: 'Orbitron', sans-serif !important;
+            font-size: 11px !important;
+            color: var(--primary-color) !important;
+            text-shadow: 0 0 5px rgba(0, 246, 255, 0.5), 0 0 10px rgba(0, 246, 255, 0.3) !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease-in-out;
+        }
+        .leaflet-control-attribution a:hover {
+            color: var(--secondary-color) !important;
+            text-shadow: 0 0 8px rgba(255, 0, 193, 0.6), 0 0 15px rgba(255, 0, 193, 0.4) !important;
+        }
+        .leaflet-control-attribution {
+            background-color: rgba(23, 28, 58, 0.7) !important;
+            padding: 5px 8px !important;
+            border-radius: 4px !important;
+            border: 1px solid var(--border-color) !important;
             box-shadow: var(--glow-shadow-sm);
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
         }
-        .bar {
-            width: 24px; height: 2px;
-            background-color: var(--primary-color);
-            transition: all 0.3s ease-in-out;
-        }
-        
-        .map-overlay {
-            display: none; /* Hidden on desktop */
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(10, 12, 26, 0.5);
-            z-index: 1001;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.35s ease;
-        }
+
+        /* === Mobile Responsive & Sidebar Toggle === */
+        #sidebar-toggle { display: none; position: absolute; top: 15px; left: 15px; z-index: 1003; width: 45px; height: 45px; background: var(--bg-surface-solid); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; box-shadow: var(--glow-shadow-sm); flex-direction: column; justify-content: center; align-items: center; gap: 5px; }
+        .bar { width: 24px; height: 2px; background-color: var(--primary-color); transition: all 0.3s ease-in-out; }
+        .map-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 12, 26, 0.5); z-index: 1001; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
 
         @media (max-width: 768px) {
             #sidebar-toggle { display: flex; }
-            .sidebar {
-                position: absolute;
-                height: 100%;
-                top: 0; left: 0;
-                transform: translateX(-100%);
-                box-shadow: var(--glow-shadow-md);
-                width: 85%; /* Sidebar tidak lagi full width */
-                max-width: 420px;
-            }
-            .sidebar-header {
-                position: sticky; /* Membuat header menempel di atas */
-                top: 0;
-                background: var(--bg-surface-solid); /* Background solid agar tidak transparan saat scroll */
-                z-index: 10;
-            }
-
+            .sidebar { position: absolute; height: 100%; top: 0; left: 0; transform: translateX(-100%); box-shadow: var(--glow-shadow-md); width: 85%; max-width: 420px; }
+            .sidebar-header { position: sticky; top: 0; background: var(--bg-surface-solid); z-index: 10; }
             .main-wrapper.sidebar-open .sidebar { transform: translateX(0); }
-            
-            .main-wrapper.sidebar-open .map-overlay {
-                display: block;
-                opacity: 1;
-                pointer-events: auto;
-            }
-            
-            /* Animasi tombol burger menjadi 'X' */
+            .main-wrapper.sidebar-open .map-overlay { display: block; opacity: 1; pointer-events: auto; }
             .main-wrapper.sidebar-open #sidebar-toggle .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
             .main-wrapper.sidebar-open #sidebar-toggle .bar:nth-child(2) { opacity: 0; }
             .main-wrapper.sidebar-open #sidebar-toggle .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
         }
-
     </style>
 </head>
 <body>
@@ -268,15 +237,16 @@
             const map = L.map('map', { zoomControl: false }).setView(initialView, 13);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> & <a href="https://carto.com/attributions">CARTO</a>',
+            // GANTI TILE LAYER KE CARTOdb DARK MATTER - TETAP GELAP TAPI DETAIL
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', {
+                attribution: '<span class="cyber-text">Made by ahdiikhf_</span> | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd', maxZoom: 20
             }).addTo(map);
             
             const categoryColors = {
                 'Restoran': '#FF5733', 'Taman': '#28A745', 'Mall': '#FFC107',
                 'Wisata': '#17A2B8', 'Kantor': '#6C757D', 'Sekolah': '#007BFF',
-                'default': '#00f6ff'
+                'default': '#00f6ff' // Warna default neon
             };
 
             let markers = L.layerGroup().addTo(map);
