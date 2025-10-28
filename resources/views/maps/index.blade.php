@@ -4,34 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Lokasi Interaktif Premium</title>
+    <title>Cyberpunk Interactive Map</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
         :root {
-            --primary-color: #6a11cb;
-            --secondary-color: #2575fc;
-            --text-dark: #2d3748;
-            --text-light: #64748b;
-            --bg-light: #f7fafc;
-            --white: #ffffff;
-            --border-color: #e2e8f0;
-            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
-            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+            --primary-color: #00f6ff; /* Neon Cyan */
+            --secondary-color: #ff00c1; /* Neon Magenta */
+            --bg-dark: #0a0c1a;
+            --bg-surface: rgba(23, 28, 58, 0.6);
+            --bg-surface-solid: #171c3a;
+            --text-light: #a0a8d3;
+            --text-bright: #e9eaff;
+            --border-color: rgba(0, 246, 255, 0.2);
+            --border-hover: rgba(0, 246, 255, 0.7);
+            --glow-shadow-sm: 0 0 8px rgba(0, 246, 255, 0.2);
+            --glow-shadow-md: 0 0 15px rgba(0, 246, 255, 0.3), 0 0 5px rgba(0, 246, 255, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-light);
-            color: var(--text-dark);
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(0, 246, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 246, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-light);
             overflow: hidden;
         }
 
@@ -40,7 +45,8 @@
         /* === Sidebar === */
         .sidebar {
             width: 420px;
-            background: var(--white);
+            background: var(--bg-surface);
+            backdrop-filter: blur(10px);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
@@ -50,77 +56,109 @@
 
         .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-color); }
         .sidebar-header h1 {
-            font-size: 24px;
-            font-weight: 800;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(255, 0, 193, 0.5);
         }
 
         .search-wrapper { position: relative; margin-top: 16px; }
-        .search-wrapper svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-light); }
-        #search-input { width: 100%; padding: 12px 16px 12px 44px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; transition: all 0.2s; background-color: var(--bg-light); }
-        #search-input:focus { outline: none; border-color: var(--secondary-color); box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2); background-color: var(--white); }
+        .search-wrapper svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-light); transition: color 0.2s; }
+        #search-input { 
+            width: 100%; padding: 12px 16px 12px 44px; border-radius: 4px; 
+            border: 1px solid var(--border-color); font-size: 14px; 
+            transition: all 0.2s; background-color: transparent; color: var(--text-bright);
+        }
+        #search-input:focus { 
+            outline: none; border-color: var(--border-hover); 
+            box-shadow: var(--glow-shadow-md);
+            background-color: var(--bg-surface-solid);
+        }
+        #search-input::placeholder { color: var(--text-light); }
+        #search-input:focus + svg { color: var(--primary-color); }
 
         .filter-section { padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
         .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .filter-btn { padding: 8px 16px; border: 1px solid var(--border-color); background: var(--white); color: var(--text-light); border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.2s; }
-        .filter-btn:hover { border-color: var(--secondary-color); color: var(--secondary-color); }
-        .filter-btn.active { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: var(--white); border-color: transparent; }
+        .filter-btn { 
+            padding: 8px 16px; border: 1px solid var(--border-color); 
+            background: transparent; color: var(--text-light); 
+            border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; 
+            transition: all 0.2s; text-transform: uppercase;
+        }
+        .filter-btn:hover { border-color: var(--border-hover); color: var(--primary-color); box-shadow: var(--glow-shadow-sm); }
+        .filter-btn.active { 
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); 
+            color: var(--bg-dark); border-color: transparent; font-weight: 700;
+            box-shadow: 0 0 15px rgba(255, 0, 193, 0.4);
+        }
 
         .locations-list { flex-grow: 1; overflow-y: auto; padding: 16px 8px 24px 24px; }
-        .list-header { font-size: 14px; font-weight: 600; color: var(--text-light); padding: 0 16px 16px 0; }
+        .list-header { font-size: 14px; font-weight: 600; color: var(--text-light); padding: 0 16px 16px 0; text-transform: uppercase; letter-spacing: 1px; }
 
         .location-card {
-            background: var(--white);
-            border: 1px solid transparent;
-            border-left: 4px solid transparent;
-            border-radius: 12px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--border-color);
+            border-radius: 4px;
             padding: 16px;
             margin: 0 16px 16px 0;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: var(--shadow-sm);
         }
-        .location-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-        .location-card.active { border-left: 4px solid var(--secondary-color); background: #f0f5ff; }
+        .location-card:hover { 
+            transform: translateY(-3px); 
+            box-shadow: var(--glow-shadow-md);
+            border-color: var(--border-hover);
+            border-left-color: var(--primary-color);
+        }
+        .location-card.active { 
+            border-left: 4px solid var(--primary-color); 
+            background: rgba(0, 246, 255, 0.05);
+            border-color: var(--border-hover);
+        }
         .location-card.hidden { display: none; }
-        .location-image { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 16px; transition: transform 0.3s ease; }
-        .location-card:hover .location-image { transform: scale(1.03); }
-        .location-name { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
-        .location-category { display: inline-block; padding: 5px 12px; background-color: var(--bg-light); color: var(--primary-color); border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+        .location-image { width: 100%; height: 160px; object-fit: cover; border-radius: 4px; margin-bottom: 16px; opacity: 0.85; transition: opacity 0.3s ease;}
+        .location-card:hover .location-image { opacity: 1; }
+        .location-name { font-size: 18px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px; }
+        .location-category { 
+            display: inline-block; padding: 5px 12px; 
+            background-color: var(--border-color); 
+            color: var(--primary-color); border-radius: 20px; 
+            font-size: 11px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase;
+        }
         .location-address { color: var(--text-light); font-size: 13px; display: flex; align-items: start; gap: 8px; line-height: 1.5; }
-        .location-address svg { margin-top: 3px; min-width: 14px; }
+        .location-address svg { margin-top: 3px; min-width: 14px; color: var(--primary-color); }
         
-        #no-results { text-align: center; color: #999; padding: 50px 20px; display: none; }
+        #no-results { text-align: center; color: var(--text-light); padding: 50px 20px; display: none; }
+        #no-results h3 { font-family: 'Orbitron', sans-serif; color: var(--secondary-color); }
 
         /* === Map Area === */
-        .map-container { flex-grow: 1; position: relative; background: #eee; }
+        .map-container { flex-grow: 1; position: relative; background: var(--bg-dark); }
         #map { height: 100%; width: 100%; z-index: 1; }
-        .leaflet-top.leaflet-left { top: 78px; } /* Pindah zoom control */
+        .leaflet-top.leaflet-right { top: 78px; right: 15px; } /* Pindah zoom control */
+        .leaflet-control-zoom-in, .leaflet-control-zoom-out { background-color: var(--bg-surface-solid) !important; border: 1px solid var(--border-color) !important; color: var(--primary-color) !important; border-radius: 4px !important; }
+        .leaflet-control-zoom-in:hover, .leaflet-control-zoom-out:hover { background-color: var(--bg-dark) !important; }
 
         /* === Mobile Responsive & Sidebar Toggle === */
         #sidebar-toggle {
-            display: none;
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 1003;
-            width: 45px;
-            height: 45px;
-            background: var(--white);
+            display: none; position: absolute; top: 15px; left: 15px; z-index: 1003;
+            width: 45px; height: 45px;
+            background: var(--bg-surface-solid);
             border: 1px solid var(--border-color);
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: var(--shadow-md);
-            justify-content: center;
-            align-items: center;
+            box-shadow: var(--glow-shadow-md);
+            justify-content: center; align-items: center;
         }
-        .map-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; }
+        #sidebar-toggle svg { color: var(--primary-color); }
+        .map-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 12, 26, 0.7); backdrop-filter: blur(5px); z-index: 1001; }
 
         @media (max-width: 768px) {
             #sidebar-toggle { display: flex; }
-            .sidebar { position: absolute; height: 100%; top: 0; left: 0; transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+            .sidebar { position: absolute; height: 100%; top: 0; left: 0; transform: translateX(-100%); box-shadow: var(--glow-shadow-md); }
             .main-wrapper.sidebar-open .sidebar { transform: translateX(0); }
             .main-wrapper.sidebar-open .map-overlay { display: block; }
         }
@@ -128,17 +166,18 @@
         /* === Custom Marker & Popup Style === */
         @keyframes marker-pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .custom-marker-pin { animation: marker-pop 0.3s ease-out; }
-        .leaflet-popup-content-wrapper { border-radius: 10px !important; box-shadow: var(--shadow-md); }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--bg-surface-solid) !important; border: 1px solid var(--border-color) !important; border-radius: 4px !important; box-shadow: var(--glow-shadow-md) !important; color: var(--text-light) !important; }
         .leaflet-popup-content { margin: 15px !important; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .popup-image { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
-        .popup-title { font-size: 16px; font-weight: 700; margin: 0 0 5px 0; }
-        .popup-category { display: inline-block; padding: 4px 10px; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: white; border-radius: 10px; font-size: 10px; font-weight: 600; margin-bottom: 8px; }
+        .leaflet-popup-close-button { color: var(--text-light) !important; }
+        .popup-image { width: 100%; height: 120px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; opacity: 0.9; }
+        .popup-title { font-size: 16px; font-weight: 700; margin: 0 0 5px 0; color: var(--text-bright); }
+        .popup-category { display: inline-block; padding: 4px 10px; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: var(--bg-dark); border-radius: 10px; font-size: 10px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
 
         /* === Scrollbar === */
         .locations-list::-webkit-scrollbar { width: 8px; }
         .locations-list::-webkit-scrollbar-track { background: transparent; }
-        .locations-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; border: 2px solid var(--white); }
-        .locations-list::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        .locations-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; border: 2px solid transparent; }
+        .locations-list::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -150,10 +189,10 @@
 
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>🗺️ Jelajah Peta</h1>
+                <h1>./Jelajah_Peta</h1>
                 <div class="search-wrapper">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                     <input type="text" id="search-input" placeholder="Cari nama lokasi, alamat...">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                 </div>
             </div>
 
@@ -219,29 +258,32 @@
             const map = L.map('map', { zoomControl: false }).setView(initialView, 13);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            // GANTI TILE LAYER KE VERSI GELAP (DARK MODE)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd', maxZoom: 20
             }).addTo(map);
             
             const categoryColors = {
                 'Restoran': '#FF5733', 'Taman': '#28A745', 'Mall': '#FFC107',
-                'Wisata': '#17A2B8', 'Kantor': '#6C757D', 'Sekolah': '#007BFF'
+                'Wisata': '#17A2B8', 'Kantor': '#6C757D', 'Sekolah': '#007BFF',
+                'default': '#00f6ff' // Warna default neon
             };
 
             let markers = L.layerGroup().addTo(map);
 
             function createIcon(category) {
-                const color = categoryColors[category] || '#6a11cb';
-                const html = `<div style="background-color:${color};width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 5px rgba(0,0,0,0.4);"></div>`;
-                return L.divIcon({ html: html, className: 'custom-marker-pin', iconSize: [26, 26], iconAnchor: [13, 13] });
+                const color = categoryColors[category] || categoryColors['default'];
+                // Icon dengan efek glow
+                const html = `<div style="width:16px;height:16px;border-radius:50%;background-color:${color};border:2px solid white;box-shadow:0 0 10px ${color}, 0 0 15px ${color};"></div>`;
+                return L.divIcon({ html: html, className: 'custom-marker-pin', iconSize: [20, 20], iconAnchor: [10, 10] });
             }
             
             function populateMarkers(filteredLocations) {
                 markers.clearLayers();
                 filteredLocations.forEach(location => {
                     let popupContent = '';
-                    if (location.image) popupContent += `<img src="/storage/${location.image}" class="popup-image">`;
+                    if (location.image) popupContent += `<img src="{{ Storage::url('') }}${location.image}" class="popup-image">`;
                     popupContent += `<div class="popup-title">${location.name}</div><span class="popup-category">${location.category}</span><p style="margin:5px 0;font-size:13px;">${location.address}</p>`;
                     
                     const marker = L.marker([location.latitude, location.longitude], { icon: createIcon(location.category) })
@@ -257,7 +299,7 @@
                 });
             }
 
-            // === Fungsionalitas UI & Event Listeners ===
+            // === Fungsionalitas UI & Event Listeners (TIDAK ADA YANG DIUBAH) ===
             const filterButtons = document.querySelectorAll('.filter-btn');
             const locationCards = document.querySelectorAll('.location-card');
             const searchInput = document.getElementById('search-input');
@@ -278,7 +320,6 @@
                     if (categoryMatch && searchMatch) {
                         card.classList.remove('hidden');
                         visibleCount++;
-                        // Cari data lokasi asli untuk dikirim ke peta
                         const originalLocation = locations.find(loc => loc.id == cardData.id);
                         if(originalLocation) filteredLocationsForMap.push(originalLocation);
                     } else {
