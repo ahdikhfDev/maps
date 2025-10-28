@@ -163,21 +163,36 @@
         .leaflet-control-attribution .cyber-text {
             font-family: 'Orbitron', sans-serif !important;
             font-size: 11px !important;
-            color: var(--primary-color) !important; /* Neon Cyan */
+            color: var(--primary-color) !important;
             text-shadow: 0 0 5px rgba(0, 246, 255, 0.5), 0 0 10px rgba(0, 246, 255, 0.3) !important;
             text-decoration: none !important;
             transition: all 0.2s ease-in-out;
         }
         .leaflet-control-attribution a:hover {
-            color: var(--secondary-color) !important; /* Neon Magenta */
+            color: var(--secondary-color) !important;
             text-shadow: 0 0 8px rgba(255, 0, 193, 0.6), 0 0 15px rgba(255, 0, 193, 0.4) !important;
         }
         .leaflet-control-attribution {
-            background-color: rgba(23, 28, 58, 0.7) !important; /* Latar belakang semi-transparan */
+            background-color: rgba(23, 28, 58, 0.7) !important;
             padding: 5px 8px !important;
             border-radius: 4px !important;
             border: 1px solid var(--border-color) !important;
             box-shadow: var(--glow-shadow-sm);
+        }
+
+        /* === EFEK DENYUT NEON BARU === */
+        @keyframes pulse-animation {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+        .pulsating-halo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 246, 255, 0) 0%, rgba(0, 246, 255, 0.3) 40%, rgba(0, 246, 255, 0) 70%);
+            animation: pulse-animation 3s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            pointer-events: none; /* Agar tidak bisa diklik */
         }
     </style>
 </head>
@@ -259,7 +274,6 @@
             const map = L.map('map', { zoomControl: false }).setView(initialView, 13);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            // GANTI TILE LAYER KE VERSI GELAP (DARK MODE) DENGAN ATRIBUSI CYBER
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                 attribution: '<span class="cyber-text">Made by ahdiikhf_</span> | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd', maxZoom: 20
@@ -273,9 +287,34 @@
 
             let markers = L.layerGroup().addTo(map);
 
+            // === PENAMBAHAN FUNGSI EFEK DENYUT ===
+            function addPulsatingHalo(locationsData) {
+                if (!locationsData || locationsData.length === 0) return;
+
+                // Hitung titik pusat dari semua lokasi
+                let totalLat = 0;
+                let totalLng = 0;
+                locationsData.forEach(loc => {
+                    totalLat += parseFloat(loc.latitude);
+                    totalLng += parseFloat(loc.longitude);
+                });
+                const centerLat = totalLat / locationsData.length;
+                const centerLng = totalLng / locationsData.length;
+
+                // Buat custom icon untuk efek denyut
+                const pulseIcon = L.divIcon({
+                    className: 'pulsating-halo-container',
+                    html: `<div class="pulsating-halo"></div>`,
+                    iconSize: [200, 200],
+                    iconAnchor: [100, 100]
+                });
+
+                // Tambahkan marker dengan efek denyut ke peta
+                L.marker([centerLat, centerLng], { icon: pulseIcon, interactive: false }).addTo(map);
+            }
+
             function createIcon(category) {
                 const color = categoryColors[category] || categoryColors['default'];
-                // Icon dengan efek glow
                 const html = `<div style="width:16px;height:16px;border-radius:50%;background-color:${color};border:2px solid white;box-shadow:0 0 10px ${color}, 0 0 15px ${color};"></div>`;
                 return L.divIcon({ html: html, className: 'custom-marker-pin', iconSize: [20, 20], iconAnchor: [10, 10] });
             }
@@ -331,7 +370,7 @@
                 populateMarkers(filteredLocationsForMap);
                 locationCountEl.textContent = visibleCount;
                 noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
-                setActiveCard(null); // Reset active card on filter
+                setActiveCard(null);
             }
 
             function setActiveCard(locationId) {
@@ -385,6 +424,7 @@
 
             // Initial Load
             applyFiltersAndSearch();
+            addPulsatingHalo(locations); // Panggil fungsi efek denyut saat pertama kali dimuat
         });
     </script>
 </body>
