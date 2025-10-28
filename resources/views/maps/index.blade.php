@@ -180,7 +180,7 @@
             box-shadow: var(--glow-shadow-sm);
         }
 
-        /* === EFEK DENYUT NEON BARU === */
+        /* === Efek Denyut Neon === */
         @keyframes pulse-animation {
             0% { transform: scale(0.8); opacity: 0.5; }
             50% { transform: scale(1.5); opacity: 1; }
@@ -192,7 +192,25 @@
             border-radius: 50%;
             background: radial-gradient(circle, rgba(0, 246, 255, 0) 0%, rgba(0, 246, 255, 0.3) 40%, rgba(0, 246, 255, 0) 70%);
             animation: pulse-animation 3s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            pointer-events: none; /* Agar tidak bisa diklik */
+            pointer-events: none;
+        }
+
+        /* === TULISAN JUDUL DI ATAS PETA === */
+        .cyber-title-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow:
+                0 0 7px #fff,
+                0 0 10px #fff,
+                0 0 21px #fff,
+                0 0 42px var(--primary-color),
+                0 0 82px var(--primary-color),
+                0 0 92px var(--primary-color);
+            text-align: center;
+            white-space: nowrap;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -287,30 +305,38 @@
 
             let markers = L.layerGroup().addTo(map);
 
-            // === PENAMBAHAN FUNGSI EFEK DENYUT ===
-            function addPulsatingHalo(locationsData) {
-                if (!locationsData || locationsData.length === 0) return;
-
-                // Hitung titik pusat dari semua lokasi
+            function getCenterPoint(locationsData) {
+                if (!locationsData || locationsData.length === 0) return null;
                 let totalLat = 0;
                 let totalLng = 0;
                 locationsData.forEach(loc => {
                     totalLat += parseFloat(loc.latitude);
                     totalLng += parseFloat(loc.longitude);
                 });
-                const centerLat = totalLat / locationsData.length;
-                const centerLng = totalLng / locationsData.length;
+                return [totalLat / locationsData.length, totalLng / locationsData.length];
+            }
 
-                // Buat custom icon untuk efek denyut
+            function addPulsatingHalo(centerPoint) {
+                if (!centerPoint) return;
                 const pulseIcon = L.divIcon({
                     className: 'pulsating-halo-container',
                     html: `<div class="pulsating-halo"></div>`,
                     iconSize: [200, 200],
                     iconAnchor: [100, 100]
                 });
+                L.marker(centerPoint, { icon: pulseIcon, interactive: false }).addTo(map);
+            }
 
-                // Tambahkan marker dengan efek denyut ke peta
-                L.marker([centerLat, centerLng], { icon: pulseIcon, interactive: false }).addTo(map);
+            // === FUNGSI BARU UNTUK MENAMBAHKAN LABEL NAMA ===
+            function addCenterLabel(centerPoint) {
+                if (!centerPoint) return;
+                const titleIcon = L.divIcon({
+                    className: 'leaflet-div-icon', // Kelas dasar leaflet
+                    html: `<div class="cyber-title-label">ahdiikhf_</div>`,
+                    iconSize: [250, 50],  // Perkiraan ukuran text agar anchor bekerja
+                    iconAnchor: [125, 80] // Anchor di tengah-bawah, lalu digeser ke atas (80)
+                });
+                L.marker(centerPoint, { icon: titleIcon, interactive: false }).addTo(map);
             }
 
             function createIcon(category) {
@@ -339,7 +365,7 @@
                 });
             }
 
-            // === Fungsionalitas UI & Event Listeners (TIDAK ADA YANG DIUBAH) ===
+            // === Fungsionalitas UI & Event Listeners ===
             const filterButtons = document.querySelectorAll('.filter-btn');
             const locationCards = document.querySelectorAll('.location-card');
             const searchInput = document.getElementById('search-input');
@@ -424,7 +450,9 @@
 
             // Initial Load
             applyFiltersAndSearch();
-            addPulsatingHalo(locations); // Panggil fungsi efek denyut saat pertama kali dimuat
+            const centerPoint = getCenterPoint(locations);
+            addPulsatingHalo(centerPoint);
+            addCenterLabel(centerPoint); // Panggil fungsi untuk menambahkan label
         });
     </script>
 </body>
