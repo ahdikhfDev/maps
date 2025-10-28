@@ -14,6 +14,6 @@ class MapController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return view('maps.index', compact('locations'));
+        return view('maps.index', data: compact('locations'));
     }
 }

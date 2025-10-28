@@ -34,7 +34,7 @@ class LocationSeeder extends Seeder
                 'image' => null,
                 'is_active' => $faker->boolean(90),
                 'created_at' => now(),
-                'updated_at' => now(),
+                'updated_at' => now(),  
             ]);
         }
     }
