@@ -13,8 +13,12 @@
             "dest": "/public/storage/$1"
         },
         {
-            "src": "/build/(.*)",
-            "dest": "/public/build/$1"
+            "src": "/livewire/(.*)",
+            "dest": "/api/index.php"
+        },
+        {
+            "src": "/filament/(.*)",
+            "dest": "/api/index.php"
         },
         {
             "src": "/css/(.*)",
@@ -25,7 +29,11 @@
             "dest": "/public/js/$1"
         },
         {
-            "src": "/(.*\\.(css|js|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+            "src": "/build/(.*)",
+            "dest": "/public/build/$1"
+        },
+        {
+            "src": "/(.*\\.(css|js|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp))",
             "dest": "/public/$1"
         },
         {
@@ -36,7 +44,7 @@
     ],
     "env": {
         "APP_ENV": "production",
-        "APP_DEBUG": "false",
+        "APP_DEBUG": "true",
         "APP_URL": "https://maps-ruby.vercel.app",
         "ASSET_URL": "https://maps-ruby.vercel.app",
         
@@ -51,8 +59,10 @@
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie",
         "SESSION_LIFETIME": "120",
+        "SESSION_SECURE_COOKIE": "true",
         "QUEUE_CONNECTION": "sync",
         
+        "FILESYSTEM_DISK": "public",
         "FILAMENT_FILESYSTEM_DISK": "public"
     }
 }
