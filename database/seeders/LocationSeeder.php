@@ -18,12 +18,12 @@ class LocationSeeder extends Seeder
         // Beberapa kategori umum di Bogor
         $categories = [
             'Restoran', 'Kafe', 'Taman', 'Hotel', 'Museum', 
-            'Toko', 'Kantor', 'Gym', 'Rumah Sakit', 'Sekolah', 'mall', 'wisata'
+            'Toko', 'Kantor', 'Gym', 'Rumah Sakit', 'Sekolah', 'mal', 'wisata'
         ];
 
         // Gambar tetap dari URL kamu
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 10000; $i++) {
             DB::table('locations')->insert([
                 'name' => 'Lokasi ' . $faker->company,
                 'address' => $faker->streetAddress . ', Bogor, Jawa Barat',

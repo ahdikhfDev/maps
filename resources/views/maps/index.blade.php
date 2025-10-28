@@ -32,7 +32,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-dark);
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 246, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 246, 255, 0.05) 1px, transparent 1px);
             background-size: 30px 30px;
@@ -67,13 +67,13 @@
 
         .search-wrapper { position: relative; margin-top: 16px; }
         .search-wrapper svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-light); transition: color 0.2s; }
-        #search-input { 
-            width: 100%; padding: 12px 16px 12px 44px; border-radius: 4px; 
-            border: 1px solid var(--border-color); font-size: 14px; 
+        #search-input {
+            width: 100%; padding: 12px 16px 12px 44px; border-radius: 4px;
+            border: 1px solid var(--border-color); font-size: 14px;
             transition: all 0.2s; background-color: transparent; color: var(--text-bright);
         }
-        #search-input:focus { 
-            outline: none; border-color: var(--border-hover); 
+        #search-input:focus {
+            outline: none; border-color: var(--border-hover);
             box-shadow: var(--glow-shadow-md);
             background-color: var(--bg-surface-solid);
         }
@@ -82,15 +82,15 @@
 
         .filter-section { padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
         .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .filter-btn { 
-            padding: 8px 16px; border: 1px solid var(--border-color); 
-            background: transparent; color: var(--text-light); 
-            border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; 
+        .filter-btn {
+            padding: 8px 16px; border: 1px solid var(--border-color);
+            background: transparent; color: var(--text-light);
+            border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;
             transition: all 0.2s; text-transform: uppercase;
         }
         .filter-btn:hover { border-color: var(--border-hover); color: var(--primary-color); box-shadow: var(--glow-shadow-sm); }
-        .filter-btn.active { 
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); 
+        .filter-btn.active {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             color: var(--bg-dark); border-color: transparent; font-weight: 700;
             box-shadow: 0 0 15px rgba(255, 0, 193, 0.4);
         }
@@ -108,14 +108,14 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        .location-card:hover { 
-            transform: translateY(-3px); 
+        .location-card:hover {
+            transform: translateY(-3px);
             box-shadow: var(--glow-shadow-md);
             border-color: var(--border-hover);
             border-left-color: var(--primary-color);
         }
-        .location-card.active { 
-            border-left: 4px solid var(--primary-color); 
+        .location-card.active {
+            border-left: 4px solid var(--primary-color);
             background: rgba(0, 246, 255, 0.05);
             border-color: var(--border-hover);
         }
@@ -123,15 +123,15 @@
         .location-image { width: 100%; height: 160px; object-fit: cover; border-radius: 4px; margin-bottom: 16px; opacity: 0.85; transition: opacity 0.3s ease;}
         .location-card:hover .location-image { opacity: 1; }
         .location-name { font-size: 18px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px; }
-        .location-category { 
-            display: inline-block; padding: 5px 12px; 
-            background-color: var(--border-color); 
-            color: var(--primary-color); border-radius: 20px; 
+        .location-category {
+            display: inline-block; padding: 5px 12px;
+            background-color: var(--border-color);
+            color: var(--primary-color); border-radius: 20px;
             font-size: 11px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase;
         }
         .location-address { color: var(--text-light); font-size: 13px; display: flex; align-items: start; gap: 8px; line-height: 1.5; }
         .location-address svg { margin-top: 3px; min-width: 14px; color: var(--primary-color); }
-        
+
         #no-results { text-align: center; color: var(--text-light); padding: 50px 20px; display: none; }
         #no-results h3 { font-family: 'Orbitron', sans-serif; color: var(--secondary-color); }
 
@@ -212,17 +212,17 @@
                  <div class="list-header">
                     <span>Hasil: <span id="location-count">{{ $locations->count() }}</span> Lokasi</span>
                 </div>
-                
+
                 @forelse($locations as $location)
                 <div class="location-card"
                      data-id="{{ $location->id }}"
-                     data-lat="{{ $location->latitude }}" 
+                     data-lat="{{ $location->latitude }}"
                      data-lng="{{ $location->longitude }}"
                      data-category="{{ $location->category }}"
                      data-name="{{ strtolower($location->name) }}"
                      data-address="{{ strtolower($location->address) }}"
                      data-description="{{ strtolower($location->description ?? '') }}">
-                    
+
                     @if($location->image)
                     <img src="{{ Storage::url($location->image) }}" alt="{{ $location->name }}" class="location-image">
                     @endif
@@ -250,7 +250,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const locations = @json($locations);
@@ -260,10 +260,11 @@
 
             // GANTI TILE LAYER KE VERSI GELAP (DARK MODE)
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                // DI SINI SAYA TAMBAHKAN NAMA PEMBUATNYA
+                attribution: 'Made by ahdiikhf_ | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd', maxZoom: 20
             }).addTo(map);
-            
+
             const categoryColors = {
                 'Restoran': '#FF5733', 'Taman': '#28A745', 'Mall': '#FFC107',
                 'Wisata': '#17A2B8', 'Kantor': '#6C757D', 'Sekolah': '#007BFF',
@@ -278,17 +279,17 @@
                 const html = `<div style="width:16px;height:16px;border-radius:50%;background-color:${color};border:2px solid white;box-shadow:0 0 10px ${color}, 0 0 15px ${color};"></div>`;
                 return L.divIcon({ html: html, className: 'custom-marker-pin', iconSize: [20, 20], iconAnchor: [10, 10] });
             }
-            
+
             function populateMarkers(filteredLocations) {
                 markers.clearLayers();
                 filteredLocations.forEach(location => {
                     let popupContent = '';
                     if (location.image) popupContent += `<img src="{{ Storage::url('') }}${location.image}" class="popup-image">`;
                     popupContent += `<div class="popup-title">${location.name}</div><span class="popup-category">${location.category}</span><p style="margin:5px 0;font-size:13px;">${location.address}</p>`;
-                    
+
                     const marker = L.marker([location.latitude, location.longitude], { icon: createIcon(location.category) })
                         .bindPopup(popupContent);
-                    
+
                     marker.locationId = location.id;
 
                     marker.on('click', () => {
@@ -316,7 +317,7 @@
                     const cardData = card.dataset;
                     const categoryMatch = activeCategory === 'all' || cardData.category === activeCategory;
                     const searchMatch = cardData.name.includes(searchTerm) || cardData.address.includes(searchTerm) || cardData.description.includes(searchTerm);
-                    
+
                     if (categoryMatch && searchMatch) {
                         card.classList.remove('hidden');
                         visibleCount++;
@@ -359,9 +360,9 @@
                     const lat = parseFloat(this.dataset.lat);
                     const lng = parseFloat(this.dataset.lng);
                     const id = this.dataset.id;
-                    
+
                     map.flyTo([lat, lng], 16, { animate: true, duration: 1 });
-                    
+
                     markers.eachLayer(marker => {
                         if (marker.locationId == id) {
                             setTimeout(() => marker.openPopup(), 600);
@@ -371,7 +372,7 @@
                     setActiveCard(id);
                 });
             });
-            
+
             map.on('popupclose', () => setActiveCard(null));
 
             // Sidebar Toggle for Mobile
