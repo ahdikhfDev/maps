@@ -142,27 +142,6 @@
         .leaflet-control-zoom-in, .leaflet-control-zoom-out { background-color: var(--bg-surface-solid) !important; border: 1px solid var(--border-color) !important; color: var(--primary-color) !important; border-radius: 4px !important; }
         .leaflet-control-zoom-in:hover, .leaflet-control-zoom-out:hover { background-color: var(--bg-dark) !important; }
 
-        /* === Mobile Responsive & Sidebar Toggle === */
-        #sidebar-toggle {
-            display: none; position: absolute; top: 15px; left: 15px; z-index: 1003;
-            width: 45px; height: 45px;
-            background: var(--bg-surface-solid);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: var(--glow-shadow-md);
-            justify-content: center; align-items: center;
-        }
-        #sidebar-toggle svg { color: var(--primary-color); }
-        .map-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 12, 26, 0.7); backdrop-filter: blur(5px); z-index: 1001; }
-
-        @media (max-width: 768px) {
-            #sidebar-toggle { display: flex; }
-            .sidebar { position: absolute; height: 100%; top: 0; left: 0; transform: translateX(-100%); box-shadow: var(--glow-shadow-md); }
-            .main-wrapper.sidebar-open .sidebar { transform: translateX(0); }
-            .main-wrapper.sidebar-open .map-overlay { display: block; }
-        }
-
         /* === Custom Marker & Popup Style === */
         @keyframes marker-pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .custom-marker-pin { animation: marker-pop 0.3s ease-out; }
@@ -178,6 +157,28 @@
         .locations-list::-webkit-scrollbar-track { background: transparent; }
         .locations-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; border: 2px solid transparent; }
         .locations-list::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+        /* === Custom Cyberpunk Attribution Style === */
+        .leaflet-control-attribution a,
+        .leaflet-control-attribution .cyber-text {
+            font-family: 'Orbitron', sans-serif !important;
+            font-size: 11px !important;
+            color: var(--primary-color) !important; /* Neon Cyan */
+            text-shadow: 0 0 5px rgba(0, 246, 255, 0.5), 0 0 10px rgba(0, 246, 255, 0.3) !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease-in-out;
+        }
+        .leaflet-control-attribution a:hover {
+            color: var(--secondary-color) !important; /* Neon Magenta */
+            text-shadow: 0 0 8px rgba(255, 0, 193, 0.6), 0 0 15px rgba(255, 0, 193, 0.4) !important;
+        }
+        .leaflet-control-attribution {
+            background-color: rgba(23, 28, 58, 0.7) !important; /* Latar belakang semi-transparan */
+            padding: 5px 8px !important;
+            border-radius: 4px !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--glow-shadow-sm);
+        }
     </style>
 </head>
 <body>
@@ -258,10 +259,9 @@
             const map = L.map('map', { zoomControl: false }).setView(initialView, 13);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
-            // GANTI TILE LAYER KE VERSI GELAP (DARK MODE)
+            // GANTI TILE LAYER KE VERSI GELAP (DARK MODE) DENGAN ATRIBUSI CYBER
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                // DI SINI SAYA TAMBAHKAN NAMA PEMBUATNYA
-                attribution: 'Made by ahdiikhf_ | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                attribution: '<span class="cyber-text">Made by ahdiikhf_</span> | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd', maxZoom: 20
             }).addTo(map);
 
